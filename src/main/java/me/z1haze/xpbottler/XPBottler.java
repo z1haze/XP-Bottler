@@ -4,6 +4,7 @@ import me.z1haze.commons.lang.LanguageLoader;
 import me.z1haze.commons.model.ModelLoader;
 import me.z1haze.commons.recipe.RecipeLoader;
 import me.z1haze.commons.util.ChatUtils;
+import me.z1haze.commons.util.FileUtils;
 import me.z1haze.xpbottler.command.XPBottlerCommand;
 import me.z1haze.xpbottler.item.Flask;
 import me.z1haze.xpbottler.listener.ExpBottleListener;
@@ -33,7 +34,7 @@ public final class XPBottler extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        FileUtils.saveAndMergeDefaultConfig(this);
 
         ChatUtils.init(this, "&f&l[&3&lXPBottler&f&l]&r");
 

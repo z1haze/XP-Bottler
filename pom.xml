@@ -6,7 +6,7 @@
 
     <groupId>me.z1haze</groupId>
     <artifactId>XPBottler</artifactId>
-    <version>3.1.0</version>
+    <version>3.1.1</version>
     <packaging>jar</packaging>
 
     <name>XPBottler</name>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>me.z1haze</groupId>
             <artifactId>plugin-commons</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
 
