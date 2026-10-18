@@ -2,14 +2,13 @@ package me.z1haze.xpbottler.item;
 
 import me.z1haze.commons.util.ChatUtils;
 import me.z1haze.xpbottler.XPBottler;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.components.consumable.ConsumableComponent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionType;
@@ -38,7 +37,7 @@ public class Flask {
         this.plugin = plugin;
         this.xp = xp;
         this.capacity = capacity;
-        this.stack = new ItemStack(Material.POTION);
+        this.stack = createPotion();
 
         setItemMeta();
     }
@@ -99,7 +98,6 @@ public class Flask {
 
         meta.getPersistentDataContainer().set(plugin.getKey(XP_KEY), PersistentDataType.INTEGER, xp);
         meta.setLore(getLore());
-        setDrinkTime(meta);
         stack.setItemMeta(meta);
     }
 
@@ -124,7 +122,6 @@ public class Flask {
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         meta.setDisplayName(ChatUtils.colorize(getTitle()));
         meta.setLore(getLore());
-        setDrinkTime(meta);
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
         data.set(plugin.getKey(XP_KEY), PersistentDataType.INTEGER, xp);
@@ -136,16 +133,14 @@ public class Flask {
     }
 
     /**
-     * Swaps the potion's 1.6 second drink for flask.drink-seconds. Refreshed on every Sip and Fill,
-     * so older Flasks pick up config changes too.
+     * Swaps the potion's 1.6 second drink for flask.drink-seconds. Uses the component string rather
+     * than a consumable API, since Spigot and Paper each have their own. Set once at creation, so
+     * existing Flasks keep their drink time when the config changes.
      */
-    private void setDrinkTime(ItemMeta meta) {
-        ConsumableComponent drink = meta.getConsumable();
-        drink.setConsumeSeconds(plugin.getFlaskDrinkSeconds());
-        drink.setAnimation(ConsumableComponent.Animation.DRINK);
-        drink.setSound(Sound.ENTITY_GENERIC_DRINK);
-        drink.setConsumeParticles(false);
-        meta.setConsumable(drink);
+    private ItemStack createPotion() {
+        return Bukkit.getItemFactory().createItemStack("minecraft:potion[consumable={consume_seconds:"
+                + plugin.getFlaskDrinkSeconds()
+                + ",animation:'drink',sound:'entity.generic.drink',has_consume_particles:false}]");
     }
 
     private String getTitle() {

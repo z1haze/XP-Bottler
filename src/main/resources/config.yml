@@ -33,6 +33,7 @@ flask:
   xp-per-sip: 250
 
   # How long one Sip takes, in seconds. A vanilla potion takes 1.6.
+  # Only affects Flasks created from now on. Existing Flasks keep their drink time.
   drink-seconds: 0.6
 
   # The most XP a Flask can hold. -1 means no limit.
