@@ -1,0 +1,22 @@
+name: XPBottler
+version: '${project.version}'
+author: z1haze
+description: Bottle your experience points into throwable XP bottles
+main: me.z1haze.xpbottler.XPBottler
+api-version: '26.3'
+
+commands:
+  xpb:
+    description: Bottle your XP, give bottles to players, or reload the plugin
+    usage: /xpb [give <player> [amount] [xp] | reload]
+
+permissions:
+  xpbottler.use:
+    description: Allows bottling your own XP with /xpb
+    default: true
+  xpbottler.give:
+    description: Allows giving XP bottles to players with /xpb give
+    default: op
+  xpbottler.reload:
+    description: Allows reloading the plugin with /xpb reload
+    default: op

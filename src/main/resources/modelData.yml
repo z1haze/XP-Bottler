@@ -1,0 +1,13 @@
+# Model Data Configuration
+# If your resource pack uses conflicting values, you can change them here and reload the plugin.
+#
+# NOTE: If you make changes here, be sure that your resource pack reflects these changes
+#
+# item_model points XP bottles at an item model in your server's resource pack,
+# for example xpbottler:experience_vial. Leave it empty to keep the vanilla bottle look.
+#
+# The model is written onto each bottle when it is created, so changes here only
+# affect new bottles. Existing bottles keep the model they were made with.
+
+bottle:
+  item_model: ""

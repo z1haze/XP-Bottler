@@ -1,0 +1,12 @@
+################################################
+# Placeholders:                                #
+#  {xp} - The XP stored in the bottle          #
+################################################
+
+# Name and lore are written onto each bottle when it is created.
+# Changing them here only affects new bottles; existing bottles keep their text.
+bottle:
+  title: "&aBottle o' Enchanting"
+  lore:
+    - "&f"
+    - "&7Contains &a{xp} XP"

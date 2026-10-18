@@ -1,0 +1,42 @@
+# XPBottler Configuration
+
+# which language to use for item names and lore.
+# available options: en
+# if you want more languages, provide me with the corresponding yaml file in your language.
+lang: en
+
+# How many XP points go into each bottle when a player runs /xpb.
+# Every bottle remembers its own XP amount, so changing this value only
+# affects bottles created from now on. Existing bottles keep their value.
+xp-per-bottle: 50
+
+# When enabled, /xpb consumes one empty glass bottle from the player's
+# inventory for every XP bottle it creates. Players with no glass bottles
+# can't bottle their XP, and players with fewer glass bottles than their
+# XP allows only fill as many as they have glass for.
+glass-bottle-cost: false
+
+# Sound played to the player when they bottle their XP.
+# Accepts Bukkit names like BLOCK_BREWING_STAND_BREW or vanilla keys like block.brewing_stand.brew
+sound:
+  enabled: true
+  name: BLOCK_BREWING_STAND_BREW
+  volume: 1.0
+  pitch: 1.0
+
+# plugin messaging
+# You can use hex color codes like &#ff009d or minecraft color codes like &d
+# Placeholders: {xp} is an XP amount, {bottles} is a bottle count, {player} is a player name,
+# {s} is an "s" when {bottles} isn't 1 (for "bottle{s}")
+messages:
+  no-permission: "&cYou don't have permission to do that!"
+  player-only: "&cThis command can only be run by a player."
+  usage: "&cUsage: /xpb [give <player> [amount] [xp] | reload]"
+  not-enough-xp: "&cYou need at least {xp} XP to fill a bottle!"
+  no-glass: "&cYou need empty glass bottles to do that!"
+  bottled: "&aBottled {xp} XP into {bottles} bottle{s}!"
+  dropped: "&e{bottles} bottle{s} didn't fit and were dropped at your feet."
+  gave: "&aGave {bottles} bottle{s} ({xp} XP each) to {player}."
+  received: "&aYou received {bottles} XP bottle{s}!"
+  player-not-found: "&cPlayer {player} is not online."
+  reloaded: "&aXPBottler reloaded!"
