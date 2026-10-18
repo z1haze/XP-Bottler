@@ -8,7 +8,7 @@ api-version: '26.3'
 commands:
   xpb:
     description: Bottle your XP, give bottles to players, or reload the plugin
-    usage: /xpb [give <player> [amount] [xp] | reload]
+    usage: /xpb [give <player> [amount] [xp] | give <player> flask [xp] [capacity] | reload]
 
 permissions:
   xpbottler.use:

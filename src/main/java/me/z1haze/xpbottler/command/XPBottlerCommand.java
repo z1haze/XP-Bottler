@@ -3,14 +3,13 @@ package me.z1haze.xpbottler.command;
 import me.z1haze.commons.event.ConfigChangeEvent;
 import me.z1haze.commons.util.ChatUtils;
 import me.z1haze.xpbottler.XPBottler;
+import me.z1haze.xpbottler.item.Flask;
 import me.z1haze.xpbottler.item.XPBottle;
-import me.z1haze.xpbottler.util.XPMath;
+import me.z1haze.xpbottler.util.PlayerXp;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -61,6 +60,10 @@ public class XPBottlerCommand implements TabExecutor {
             return startingWith(names, args[1]);
         }
 
+        if (args.length == 3 && args[0].equalsIgnoreCase("give") && sender.hasPermission("xpbottler.give")) {
+            return startingWith(List.of("flask"), args[2]);
+        }
+
         return List.of();
     }
 
@@ -77,7 +80,7 @@ public class XPBottlerCommand implements TabExecutor {
         }
 
         int xpPerBottle = plugin.getXpPerBottle();
-        int total = XPMath.totalPoints(player.getLevel(), player.getExp(), player.getExpToLevel());
+        int total = PlayerXp.getTotal(player);
         int bottles = total / xpPerBottle;
 
         if (bottles == 0) {
@@ -98,26 +101,27 @@ public class XPBottlerCommand implements TabExecutor {
         }
 
         int bottledXp = bottles * xpPerBottle;
-        setPlayerXp(player, total - bottledXp);
+        PlayerXp.set(player, total - bottledXp);
 
-        int dropped = giveBottles(player, xpPerBottle, bottles);
+        int dropped = giveItems(player, new XPBottle(plugin, xpPerBottle, bottles).getItem());
         if (dropped > 0) {
             sendColorized(player, withBottles(plugin.getMessage("dropped"), dropped));
         }
 
-        playSound(player);
+        plugin.playSound(player, "sound");
         sendColorized(player, withBottles(plugin.getMessage("bottled"), bottles)
                 .replace("{xp}", String.valueOf(bottledXp)));
     }
 
     // /xpb give <player> [amount] [xp]
+    // /xpb give <player> flask [xp] [capacity]
     private void give(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xpbottler.give")) {
             sendColorized(sender, plugin.getMessage("no-permission"));
             return;
         }
 
-        if (args.length < 2 || args.length > 4) {
+        if (args.length < 2) {
             sendColorized(sender, plugin.getMessage("usage"));
             return;
         }
@@ -125,6 +129,16 @@ public class XPBottlerCommand implements TabExecutor {
         Player target = plugin.getServer().getPlayerExact(args[1]);
         if (target == null) {
             sendColorized(sender, plugin.getMessage("player-not-found").replace("{player}", args[1]));
+            return;
+        }
+
+        if (args.length > 2 && args[2].equalsIgnoreCase("flask")) {
+            giveFlask(sender, target, args);
+            return;
+        }
+
+        if (args.length > 4) {
+            sendColorized(sender, plugin.getMessage("usage"));
             return;
         }
 
@@ -136,12 +150,38 @@ public class XPBottlerCommand implements TabExecutor {
             return;
         }
 
-        giveBottles(target, xp, amount);
+        giveItems(target, new XPBottle(plugin, xp, amount).getItem());
 
         sendColorized(sender, withBottles(plugin.getMessage("gave"), amount)
                 .replace("{xp}", String.valueOf(xp))
                 .replace("{player}", target.getName()));
         sendColorized(target, withBottles(plugin.getMessage("received"), amount));
+    }
+
+    private void giveFlask(CommandSender sender, Player target, String[] args) {
+        if (args.length > 5) {
+            sendColorized(sender, plugin.getMessage("usage"));
+            return;
+        }
+
+        int xp = args.length > 3 ? parsePositiveInt(args[3]) : 0;
+        int capacity = args.length > 4 ? parseCapacity(args[4]) : plugin.getFlaskCapacity();
+
+        if (xp < 0 || capacity == 0) {
+            sendColorized(sender, plugin.getMessage("usage"));
+            return;
+        }
+
+        if (capacity != Flask.UNLIMITED) {
+            xp = Math.min(xp, capacity);
+        }
+
+        Flask flask = new Flask(plugin, xp, capacity);
+        giveItems(target, flask.getItem());
+
+        sendColorized(sender, flask.withPlaceholders(plugin.getMessage("gave-flask"))
+                .replace("{player}", target.getName()));
+        sendColorized(target, flask.withPlaceholders(plugin.getMessage("received-flask")));
     }
 
     // /xpb reload
@@ -158,26 +198,11 @@ public class XPBottlerCommand implements TabExecutor {
     }
 
     /**
-     * Replaces the player's XP with an exact number of points.
-     * setTotalExperience is reset too so the score stays in step with what the player sees.
+     * Adds items to the player's inventory, dropping whatever doesn't fit at their feet.
+     * Returns how many items were dropped.
      */
-    private void setPlayerXp(Player player, int points) {
-        player.setLevel(0);
-        player.setExp(0f);
-        player.setTotalExperience(0);
-
-        if (points > 0) {
-            player.giveExp(points);
-        }
-    }
-
-    /**
-     * Adds bottles to the player's inventory, dropping whatever doesn't fit at their feet.
-     * Returns how many bottles were dropped.
-     */
-    private int giveBottles(Player player, int xp, int amount) {
-        ItemStack bottles = new XPBottle(plugin, xp, amount).getItem();
-        Map<Integer, ItemStack> leftover = player.getInventory().addItem(bottles);
+    private int giveItems(Player player, ItemStack items) {
+        Map<Integer, ItemStack> leftover = player.getInventory().addItem(items);
 
         int dropped = 0;
 
@@ -210,26 +235,6 @@ public class XPBottlerCommand implements TabExecutor {
         return count;
     }
 
-    @SuppressWarnings("deprecation") // Sound.valueOf still resolves both BUKKIT_NAMES and vanilla keys
-    private void playSound(Player player) {
-        ConfigurationSection sound = plugin.getConfig().getConfigurationSection("sound");
-        if (sound == null || !sound.getBoolean("enabled", true)) return;
-
-        String name = sound.getString("name", "BLOCK_BREWING_STAND_BREW");
-
-        Sound resolved;
-        try {
-            resolved = Sound.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            ChatUtils.logColorized("&cUnknown sound '" + name + "' in config.yml");
-            return;
-        }
-
-        player.playSound(player.getLocation(), resolved,
-                (float) sound.getDouble("volume", 1.0),
-                (float) sound.getDouble("pitch", 1.0));
-    }
-
     /**
      * Fills {bottles} with the count and {s} with the plural suffix that goes with it.
      */
@@ -245,6 +250,14 @@ public class XPBottlerCommand implements TabExecutor {
         } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    /**
+     * A Capacity argument: a positive number, or -1 for no limit. Returns 0 when it's neither.
+     */
+    private int parseCapacity(String text) {
+        if (text.equals(String.valueOf(Flask.UNLIMITED))) return Flask.UNLIMITED;
+        return Math.max(0, parsePositiveInt(text));
     }
 
     private List<String> startingWith(List<String> options, String prefix) {

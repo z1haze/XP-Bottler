@@ -24,14 +24,66 @@ sound:
   volume: 1.0
   pitch: 1.0
 
+# Flasks are crafted, reusable XP holders.
+# Shift + right-click with a Flask in your main hand to Fill it with xp-per-sip of your XP.
+# Drink from it to Sip xp-per-sip back out. Sipped XP goes straight onto your XP bar,
+# so unlike a thrown bottle it never repairs Mending gear.
+flask:
+  # How much XP one Sip takes out of a Flask, and one Fill puts in.
+  xp-per-sip: 250
+
+  # How long one Sip takes, in seconds. A vanilla potion takes 1.6.
+  drink-seconds: 0.6
+
+  # The most XP a Flask can hold. -1 means no limit.
+  # Every Flask keeps the capacity it was made with, so changing this value only
+  # affects Flasks created from now on. Existing Flasks keep their capacity, which
+  # makes old high-capacity Flasks rare once you lower it.
+  # Admins can also give Flasks with any capacity using /xpb give <player> flask [xp] [capacity]
+  capacity: -1
+
+  # Sound played when a player Fills a Flask
+  fill-sound:
+    enabled: true
+    name: BLOCK_BREWING_STAND_BREW
+    volume: 1.0
+    pitch: 1.0
+
+  # Sound played when a player finishes a Sip
+  sip-sound:
+    enabled: true
+    name: ENTITY_GENERIC_DRINK
+    volume: 1.0
+    pitch: 1.0
+
+# Credit to snowgears (https://github.com/snowgears) for the origin for the config format
+# Add as many recipes as you want. Ensure the materials match from here (https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
+# For air, just put nothing inside the square brackets like the example below.
+# You can toggle recipes on and off via the enabled flag. Recipes are not shapeless.
+# Recipe changes apply on /xpb reload. A recipe with a mistake in it is skipped and logged to the console.
+recipes:
+  flask:
+    - id: default
+      enabled: true
+      materials:
+        I: "GOLD_INGOT"
+        L: "LEATHER"
+        G: "GLASS"
+        D: "DIAMOND"
+      shape:
+        - "[][I][]"
+        - "[L][G][L]"
+        - "[L][D][L]"
+
 # plugin messaging
 # You can use hex color codes like &#ff009d or minecraft color codes like &d
 # Placeholders: {xp} is an XP amount, {bottles} is a bottle count, {player} is a player name,
-# {s} is an "s" when {bottles} isn't 1 (for "bottle{s}")
+# {s} is an "s" when {bottles} isn't 1 (for "bottle{s}"),
+# {capacity} is a Flask's capacity (the lang file's flask.unlimited symbol when it has none)
 messages:
   no-permission: "&cYou don't have permission to do that!"
   player-only: "&cThis command can only be run by a player."
-  usage: "&cUsage: /xpb [give <player> [amount] [xp] | reload]"
+  usage: "&cUsage: /xpb [reload]\n&c       /xpb give <player> [amount] [xp]\n&c       /xpb give <player> flask [xp] [capacity]"
   not-enough-xp: "&cYou need at least {xp} XP to fill a bottle!"
   no-glass: "&cYou need empty glass bottles to do that!"
   bottled: "&aBottled {xp} XP into {bottles} bottle{s}!"
@@ -39,4 +91,11 @@ messages:
   gave: "&aGave {bottles} bottle{s} ({xp} XP each) to {player}."
   received: "&aYou received {bottles} XP bottle{s}!"
   player-not-found: "&cPlayer {player} is not online."
+  gave-flask: "&aGave a flask holding {xp} XP to {player}."
+  received-flask: "&aYou received a flask holding {xp} XP!"
+  flask-status: "&aFlask: {xp} / {capacity} XP"
+  flask-empty: "&cYour flask is empty!"
+  flask-full: "&cYour flask is full!"
+  flask-now-full: "&eYour flask is now full."
+  flask-no-xp: "&cYou don't have any XP to fill your flask with!"
   reloaded: "&aXPBottler reloaded!"

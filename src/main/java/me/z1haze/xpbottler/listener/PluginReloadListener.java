@@ -22,5 +22,9 @@ public class PluginReloadListener implements Listener {
 
         // Reload the item model
         plugin.reloadModelData();
+
+        // Rebuild recipes last so the crafted Flask picks up the new text, model and Capacity
+        plugin.unloadRecipes();
+        plugin.loadRecipes();
     }
 }

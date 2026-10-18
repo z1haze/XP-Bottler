@@ -3,11 +3,15 @@
 #
 # NOTE: If you make changes here, be sure that your resource pack reflects these changes
 #
-# item_model points XP bottles at an item model in your server's resource pack,
+# item_model points XP bottles and flasks at an item model in your server's resource pack,
 # for example xpbottler:experience_vial. Leave it empty to keep the vanilla bottle look.
 #
-# The model is written onto each bottle when it is created, so changes here only
-# affect new bottles. Existing bottles keep the model they were made with.
+# The model is written onto each item when it is created, so changes here only
+# affect new items. Existing bottles and flasks keep the model they were made with.
 
 bottle:
+  item_model: ""
+
+# Leave empty to keep the vanilla potion look.
+flask:
   item_model: ""

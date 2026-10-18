@@ -3,7 +3,6 @@ package me.z1haze.xpbottler.item;
 import me.z1haze.commons.util.ChatUtils;
 import me.z1haze.xpbottler.XPBottler;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -58,15 +57,7 @@ public class XPBottle {
         meta.setLore(getLore());
         meta.getPersistentDataContainer().set(plugin.getKey(XP_KEY), PersistentDataType.INTEGER, xp);
 
-        String model = plugin.getModelData().getString("bottle.item_model", "");
-        if (model != null && !model.isBlank()) {
-            NamespacedKey key = NamespacedKey.fromString(model);
-            if (key != null) {
-                meta.setItemModel(key);
-            } else {
-                ChatUtils.logColorized("&cInvalid item_model '" + model + "' in modelData.yml, using the vanilla look");
-            }
-        }
+        plugin.applyItemModel(meta, "bottle");
 
         stack.setItemMeta(meta);
     }

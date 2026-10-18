@@ -1,6 +1,7 @@
 ################################################
 # Placeholders:                                #
-#  {xp} - The XP stored in the bottle          #
+#  {xp} - The XP stored in the bottle or flask #
+#  {capacity} - The flask's capacity           #
 ################################################
 
 # Name and lore are written onto each bottle when it is created.
@@ -10,3 +11,16 @@ bottle:
   lore:
     - "&f"
     - "&7Contains &a{xp} XP"
+
+# The flask's title is written when it is created and is never changed afterwards,
+# so anvil renames stick. Its lore is rewritten every time it is filled or sipped from.
+flask:
+  title: "&aExperience Flask"
+  lore:
+    - "&f"
+    - "&7Contains &a{xp} &7/ &a{capacity} XP"
+    - "&f"
+    - "&8Shift + right-click to fill"
+    - "&8Drink to sip"
+  # shown as {capacity} when a flask has no limit
+  unlimited: "∞"
